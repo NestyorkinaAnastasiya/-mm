@@ -1,0 +1,73 @@
+﻿  slae.cpp
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(8): error C2039: DoPartition: не является членом "grd::Grid"
+  c:\users\анастасия\source\repos\mm1\mm1\grid.h(57): note:  см. объявление "grd::Grid"
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(85): error C2039: dofs: не является членом "grd::Grid"
+  c:\users\анастасия\source\repos\mm1\mm1\grid.h(57): note:  см. объявление "grd::Grid"
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(85): error C2039: dof: не является членом "grd::Element"
+  c:\users\анастасия\source\repos\mm1\mm1\grid.h(16): note:  см. объявление "grd::Element"
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(85): error C2228: выражение слева от ".x" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(86): error C2039: dofs: не является членом "grd::Grid"
+  c:\users\анастасия\source\repos\mm1\mm1\grid.h(57): note:  см. объявление "grd::Grid"
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(86): error C2039: dof: не является членом "grd::Element"
+  c:\users\анастасия\source\repos\mm1\mm1\grid.h(16): note:  см. объявление "grd::Element"
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(86): error C2228: выражение слева от ".y" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(165): error C2039: dofs: не является членом "grd::Grid"
+  c:\users\анастасия\source\repos\mm1\mm1\grid.h(57): note:  см. объявление "grd::Grid"
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(165): error C2039: dof: не является членом "grd::Element"
+  c:\users\анастасия\source\repos\mm1\mm1\grid.h(16): note:  см. объявление "grd::Element"
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(165): error C2228: выражение слева от ".x" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(166): error C2039: dofs: не является членом "grd::Grid"
+  c:\users\анастасия\source\repos\mm1\mm1\grid.h(57): note:  см. объявление "grd::Grid"
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(166): error C2039: dof: не является членом "grd::Element"
+  c:\users\анастасия\source\repos\mm1\mm1\grid.h(16): note:  см. объявление "grd::Element"
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(166): error C2228: выражение слева от ".y" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(247): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(251): warning C4018: <: несоответствие типов со знаком и без знака
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(255): error C2228: выражение слева от ".size" должно представлять класс, структуру или объединение
+  c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(255): note: тип: int
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(337): error C2109: для индекса требуется массив или указатель
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(337): error C2228: выражение слева от ".elem" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(339): error C2109: для индекса требуется массив или указатель
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(339): error C2228: выражение слева от ".edges" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(342): error C2109: для индекса требуется массив или указатель
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(342): error C2228: выражение слева от ".formNumber" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(342): error C2228: выражение слева от ".elem" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(342): error C2660: slae::SLAE::Calculate_g: функция не принимает 2 аргументов
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(346): error C2109: для индекса требуется массив или указатель
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(346): error C2228: выражение слева от ".edges" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(349): error C2109: для индекса требуется массив или указатель
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(349): error C2228: выражение слева от ".formNumber" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(349): error C2228: выражение слева от ".elem" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(349): error C2660: slae::SLAE::Calculate_g: функция не принимает 2 аргументов
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(353): error C2109: для индекса требуется массив или указатель
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(353): error C2228: выражение слева от ".edges" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(356): error C2109: для индекса требуется массив или указатель
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(356): error C2228: выражение слева от ".formNumber" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(356): error C2228: выражение слева от ".elem" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(356): error C2660: slae::SLAE::Calculate_g: функция не принимает 2 аргументов
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(360): error C2109: для индекса требуется массив или указатель
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(360): error C2228: выражение слева от ".edges" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(363): error C2109: для индекса требуется массив или указатель
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(363): error C2228: выражение слева от ".formNumber" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(363): error C2228: выражение слева от ".elem" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(363): error C2660: slae::SLAE::Calculate_g: функция не принимает 2 аргументов
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(564): error C2039: dofs: не является членом "grd::Grid"
+  c:\users\анастасия\source\repos\mm1\mm1\grid.h(57): note:  см. объявление "grd::Grid"
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(564): error C2228: выражение слева от ".size" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(566): error C2039: dofs: не является членом "grd::Grid"
+  c:\users\анастасия\source\repos\mm1\mm1\grid.h(57): note:  см. объявление "grd::Grid"
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(566): error C2228: выражение слева от ".x" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(566): error C2228: выражение слева от ".y" должно представлять класс, структуру или объединение
+c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(566): warning C4473: "fprintf": передано недостаточно аргументов для строки формата
+  c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(566): note: заполнители и их параметры ожидают переменное число аргументов в количестве 2, но было предоставлено 0
+  c:\users\анастасия\source\repos\mm1\mm1\slae.cpp(566): note: отсутствующий вариативный аргумент "1" требуется для строки форматирования "%lf"
+  parameters.cpp
+c:\users\анастасия\source\repos\mm1\mm1\parameters.cpp(48): error C2086: std::string json: переопределение
+  c:\users\анастасия\source\repos\mm1\mm1\parameters.cpp(17): note:  см. объявление "json"
+  matrix.cpp
+  main.cpp
+c:\users\анастасия\source\repos\mm1\mm1\main.cpp(5): warning C4326: возвращаемый тип "main" должен быть "int", а не "void"
+  integration.cpp
+  grid.cpp
+  basis.cpp
+  Создание кода...
