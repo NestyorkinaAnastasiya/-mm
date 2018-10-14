@@ -44,7 +44,7 @@ namespace basis
 		std::pair<double, double> GetKsiEtta(double x, double y, int element_number, double &hx, double &hy);
 		std::pair<double, double> GetKsiEtta(double x, double y, int element_number);
 
-	protected:
+	public:
 		//функции вычисления бф сплайна в точке мастер-координат, их производных, первых и вторых
 		array <function<double(double, double, double, double)>, nSplineFunc> phi;
 		array <function<double(double, double, double, double)>, nSplineFunc> dphiksi;

@@ -47,6 +47,9 @@
     <ClCompile Include="parameters.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="solver.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests.h">
@@ -68,6 +71,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="parameters.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="solver.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

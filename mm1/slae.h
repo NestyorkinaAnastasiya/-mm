@@ -5,18 +5,16 @@ using namespace integration;
 
 namespace slae
 {
-	class SLAE : private GaussIntegration
+	struct SLAE
 	{
 		//Размерность задачи
 		int n;
-		//Максимальное количество итераций в решателе
-		int maxiter = 10000;
-		//Точность решения СЛАУ
-		const double eps = 1e-10;
-		BilinearBasis basis4;
-		BiquadraticBasis basis9;
 		//Глобальная матрица
 		Matrix A;
+		//Вектор приближенного решения
+		vector <double> u;
+		//Глобальный вектор правой части
+		vector <double> F;
 		//Локальные матрицы
 		//Матрица жёсткости
 		array<array<double, 4>, 4> G;
@@ -24,10 +22,6 @@ namespace slae
 		array<array<double, 4>, 4> M;
 		//Локальный вектор правой части
 		array <double, 4> locF;
-		//Глобальный вектор правой части
-		vector <double> F;
-		//Вектор приближенного решения
-		vector <double> u;
 
 		double dphix(int i, int elementNumber, double ksi, double etta);
 		double dphiy(int i, int elementNumber, double ksi, double etta);
@@ -69,7 +63,6 @@ namespace slae
 		double Rel_Discrepancy();
 		//Решатель ЛОС с LU-факторизацией
 		void LULOS();
-	public:
 		SLAE();
 		void Solve();
 		~SLAE() {};

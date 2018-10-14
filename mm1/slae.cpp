@@ -4,8 +4,6 @@ namespace slae
 {
 	SLAE::SLAE()
 	{
-		//Построение сетки
-		grid.DoPartition();
 		//Размерность задачи соответствует общему числу базисных функций
 		n = grid.nodes.size();
 
@@ -14,7 +12,7 @@ namespace slae
 		r.resize(n);
 		z.resize(n);
 		//Генерация портрета матрицы и её инициализация
-		A.CreatePortret(n, grid);
+		A.CreatePortret();
 
 	}
 

@@ -29,9 +29,10 @@ namespace grd
 	// Заполнение сетки
 	Grid::Grid() 
 	{
-		ifstream grid_f_in, elements_f_in;
-		grid_f_in >> nodes;
-		elements_f_in >> elements;
+		DataFromTelma();
+		ifstream gridIn("grid.dt"), elementsIn("elements.dt");
+		gridIn >> nodes;
+		elementsIn >> elements;
 	}
 
 	void Grid::DataFromTelma()
@@ -102,7 +103,7 @@ namespace grd
 		fclose(fElements);
 		gridOut.close();
 		elemOut.close();
-		/*
+		
 		// Заполнение узлов с краевыми условиями
 		fopen_s(&l1, "l1.dat", "rb");
 		for (int i = 0; i < countOfBC; i++)	{
@@ -110,7 +111,7 @@ namespace grd
 			ku[i] = l - 1;
 		}
 
-		sort(ku.begin(), ku.end());*/
+		sort(ku.begin(), ku.end());
 		fclose(l1);
 	}
 
