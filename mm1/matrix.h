@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 #include <algorithm>
 #include "basis.h"
 
@@ -22,7 +23,7 @@ namespace matrix
 		vector <double> ggl;
 		// Внедиагональные элементы верхнего треугольника матрицы
 		vector <double> ggu;
-		
+
 		//Компоненты матрицы с факторизацией
 		vector <double> L;
 		vector <double> D;
@@ -35,9 +36,9 @@ namespace matrix
 		void Initialize(int size1, int size2);
 		// Умножение матрицы на вектор
 		vector <double> operator*(vector<double> x);
-	
+
 		void Clear();
-		
+
 		// Умножение транспонированной матрицы на вектор
 		void MultiplyATx(vector<double> a, vector<double>& result);
 		// Добавить элемент в матрицу

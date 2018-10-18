@@ -14,7 +14,7 @@ namespace parameters
 	Parameters::Parameters()
 	{
 		ifstream file("testing_parameters.json");
-		string json, solverName;
+		string json = "", solverName;
 
 		// Считали всё в одну строку
 		while (!file.eof()) {
@@ -45,7 +45,7 @@ namespace parameters
 
 		/* Параметры решателя ?*/
 		file.open("solver.json");
-		string json;
+		json = "";
 
 		while (!file.eof())
 		{

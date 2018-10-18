@@ -52,7 +52,7 @@ namespace basis
 		array <function<double(double, double, double, double)>, nSplineFunc> d2phiksi;
 		array <function<double(double, double, double, double)>, nSplineFunc> d2phietta;
 		SplineBasis();
-		
+
 		//функции вычисления бф сплайна в точке (x,y), их производных
 		double phi_i(int i, double x, double y, int element_number);
 		double dphi_ix(int i, double x, double y, int element_number);

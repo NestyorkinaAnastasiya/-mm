@@ -1,68 +1,43 @@
 #pragma once
-#include "integration.h"
 #include "slae.h"
-#include "parameters.h"
-using namespace integration;
-using namespace basis;
+#include "bmp24_lib.h"
+#include <set>
 using namespace slae;
-using namespace parameters;
 namespace solver
 {
-	class Solver : private GaussIntegration
+	// ѕеречисление Ч это пользовательский тип, состо€щий из набора
+	// целочисленных констант, называемых перечислител€ми.
+	enum Derivative { dx, dy };
+	class Solver
 	{
 		SLAE slae;
 
 		vector<double> qSpline;
-		vector<double> qSolution;
-		BilinearBasis blBasis;
-		SplineBasis splBasis;
-		//локальные матрицы и векторы
-		void CalculateLocals(int elementNumber);
-		void CalculateA(int elementNumber, const Point* points, int kPoints);
-		void CalculateAlphaMatrix(int elementNumber);
-		void CalculateBettaMatrix(int elementNumber);
-		void CalculateF(int elementNumber, const Point* points, int kPoints);
 
+		//¬ектор нев€зки
+		vector <double> r;
+		//¬ектор спуска
+		vector <double> z;
+
+		//¬ычисление нормы вектора
+		double Norm(const vector<double>& x);
+		//—кал€рное произведение векторов
+		double Scalar(const vector<double>& x, const vector<double>& y);
+		double RelDiscrepancy();
+		void LULOS();
 
 		void linear(solver::Solver& s);
 
 		//расчЄт решени€ и производных в точке
-		double get_solution_in_point_bilinear(double x, double y, myvector::MyVector qi);
-		double get_solution_in_point_with_spline(double x, double y, myvector::MyVector qi);
-		double get_solution_in_point_bilinear(double x,
-			double y,
-			int element_number,
-			myvector::MyVector qi);
-		double get_solution_in_point_with_spline(double x,
-			double y,
-			int element_number,
-			myvector::MyVector qi);
+		double get_solution_in_point_bilinear(double x, double y, vector<double> qi);
+		double get_solution_in_point_with_spline(double x, double y, vector<double> qi);
+		double get_solution_in_point_bilinear(double x,	double y, int elementNumber, vector<double> qi);
+		double get_solution_in_point_with_spline(double x, double y, int elementNumber, vector<double> qi);
 
-		double get_derivative_in_point_bilinear(double x,
-			double y,
-			myvector::MyVector qi,
-			Derivative d_var);
-		double get_derivative_in_point_with_spline(double x,
-			double y,
-			myvector::MyVector qi,
-			Derivative d_var);
-		double get_derivative_in_point_bilinear(double x,
-			double y,
-			int element_number,
-			myvector::MyVector qi,
-			Derivative d_var);
-		double get_derivative_in_point_with_spline(double x,
-			double y,
-			int element_number,
-			myvector::MyVector qi,
-			Derivative d_var);
-
-		//локальные матрицы и векторы
-		void calculate_locals(int element_number);
-		void calculate_A(int element_number, const point::Point* points, int k_points);
-		void calculate_alpha_matrix(int element_number);
-		void calculate_betta_matrix(int element_number);
-		void calculate_F(int element_number, const point::Point* points, int k_points);
+		double get_derivative_in_point_bilinear(double x, double y,	vector<double> qi, Derivative d);
+		double get_derivative_in_point_with_spline(double x, double y, vector<double> qi, Derivative d);
+		double get_derivative_in_point_bilinear(double x, double y,	int elementNumber,	vector<double> qi,	Derivative d);
+		double get_derivative_in_point_with_spline(double x, double y, int elementNumber, vector<double> qi, Derivative d);
 
 	public:
 
@@ -70,11 +45,9 @@ namespace solver
 		~Solver();
 
 		void Solve();
-		void get_solutions(std::ofstream& solution_f_out,
-			std::ofstream& info_f_out,
-			std::ifstream& points);
+		void GetSolutions();
 
-		void draw(unsigned int width, unsigned int height, unsigned int num_isolines);
-		void draw(unsigned int width, unsigned int height, unsigned int num_isolines, std::set<int> &nd);
+		void Draw(unsigned int width, unsigned int height, unsigned int countOfIsolines);
+		void Draw(unsigned int width, unsigned int height, unsigned int num_isolines, std::set<int> &nd);
 	};
 }

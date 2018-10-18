@@ -1,3 +1,4 @@
+#pragma once
 /*grid.h*/
 #define _CRT_SECURE_NO_WARNINGS
 #pragma once
@@ -17,11 +18,11 @@ namespace grd
 	struct Element
 	{
 		// Число степеней свободы элемента
-		int nDof; 
+		int nDof;
 		// Узлы
 		int nodes[4];
 		// Глобальные номера степеней свободы элемента
-		vector <int> dof; 
+		vector <int> dof;
 		int numberOfMaterial;
 
 		Element& operator=(Element element)
@@ -44,7 +45,7 @@ namespace grd
 		double y;
 		Point() {};
 		~Point() {};
-		Point(double xx, double yy)	{
+		Point(double xx, double yy) {
 			x = xx;
 			y = yy;
 		}

@@ -30,7 +30,7 @@ namespace matrix
 			unzeroNumbersList.clear();
 			elList.clear();
 		}
-		
+
 		//вычисляем размерность ggl,ggu
 		int gg_size = 0;
 		for (int i = 0; i < slaeSize; i++) {
@@ -136,7 +136,7 @@ namespace matrix
 			}
 		}
 	}
-	
+
 	// Добавить элемент в матрицу
 	void Matrix::AddElement(int i, int j, double element)
 	{
@@ -145,7 +145,7 @@ namespace matrix
 
 		if (i == j)	di[i] += element;
 		else {
-			if (i < j)	{
+			if (i < j) {
 				flag = false;
 				for (id = ig[j]; !flag && id < ig[j + 1]; id++)
 					if (jg[id] == i) flag = true;
@@ -186,7 +186,7 @@ namespace matrix
 			}
 		}
 	}
-	
+
 	// Сложение элементов в строке (для проверки)
 	void Matrix::Sum(vector <double> &result)
 	{
@@ -219,7 +219,7 @@ namespace matrix
 		U = ggu;
 		D = di;
 
-		for (i = 0; i < n; i++)	{
+		for (i = 0; i < n; i++) {
 			i0 = ig[i];
 			iend = ig[i + 1];
 

@@ -27,7 +27,7 @@ namespace grd
 	*/
 
 	// Заполнение сетки
-	Grid::Grid() 
+	Grid::Grid()
 	{
 		DataFromTelma();
 		ifstream gridIn("grid.dt"), elementsIn("elements.dt");
@@ -74,7 +74,7 @@ namespace grd
 		fclose(fp);
 		gridOut << countOfNodes << endl;
 		elemOut << countOfElements << endl;
-		
+
 		fopen_s(&fNodes, "rz.dat", "rb");
 		for (int i = 0; i < countOfNodes; i++) {
 			double xy[2];
@@ -92,7 +92,7 @@ namespace grd
 
 			// Нумерация в файле начинается с 1
 			for (int j = 0; j < 4; j++)
-				nodes[j]-= 1;
+				nodes[j] -= 1;
 
 			sort(nodes, nodes + 4);
 			elemOut << material;
@@ -103,10 +103,10 @@ namespace grd
 		fclose(fElements);
 		gridOut.close();
 		elemOut.close();
-		
+
 		// Заполнение узлов с краевыми условиями
 		fopen_s(&l1, "l1.dat", "rb");
-		for (int i = 0; i < countOfBC; i++)	{
+		for (int i = 0; i < countOfBC; i++) {
 			fread(&l, sizeof(int), 1, l1);
 			ku[i] = l - 1;
 		}
@@ -130,9 +130,9 @@ namespace grd
 	int Element::GetGlobalDofNumber(int dofNumber)
 	{
 		// Локальный номер узела, с кот-м ассоциирована бф
-		int num1 = dofNumber / 4;  
+		int num1 = dofNumber / 4;
 		// Какая по счёту функция на узле
-		int num2 = dofNumber - num1 * 4; 
+		int num2 = dofNumber - num1 * 4;
 		return nodes[num1] * 4 + num2;
 	}
 
@@ -145,14 +145,14 @@ namespace grd
 		elList.reserve(4);
 
 		count = 0;
-		for (int i = 0; i < size && count < 4; i++)	{
+		for (int i = 0; i < size && count < 4; i++) {
 			if (elements[i].SearchNode(nodesNumber)) {
 				count++;
 				elList.push_back(i);
 			}
 		}
 	}
-		
+
 	int Grid::SearchElement(double x, double y)
 	{
 		double xLeft, xRight, yLow, yUp;

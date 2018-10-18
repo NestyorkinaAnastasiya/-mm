@@ -76,16 +76,16 @@ namespace basis
 
 	SplineBasis::SplineBasis()
 	{
-		array <function<double(double, double)>, nSplineFunc1D> phi_;		
-		phi_[0] = [](double ksi, double h) { return 1 - 3 * ksi*ksi + 2*ksi*ksi*ksi; };
-		phi_[1] = [](double ksi, double h) { return h * (ksi - 2*ksi*ksi + ksi*ksi*ksi); };
-		phi_[2] = [](double ksi, double h) { return 3*ksi*ksi - 2*ksi*ksi; };
-		phi_[3] = [](double ksi, double h) { return h * (ksi*ksi*ksi - ksi*ksi); };
+		array <function<double(double, double)>, nSplineFunc1D> phi_;
+		phi_[0] = [](double ksi, double h) { return 1 - 3 * ksi*ksi + 2 * ksi*ksi*ksi; };
+		phi_[1] = [](double ksi, double h) { return h * (ksi - 2 * ksi*ksi + ksi * ksi*ksi); };
+		phi_[2] = [](double ksi, double h) { return 3 * ksi*ksi - 2 * ksi*ksi; };
+		phi_[3] = [](double ksi, double h) { return h * (ksi*ksi*ksi - ksi * ksi); };
 
 		array <function<double(double, double)>, nSplineFunc1D> dphi_ksi;
-		dphi_ksi[0] = [](double ksi, double h) { return 6*(ksi*ksi - ksi); };
+		dphi_ksi[0] = [](double ksi, double h) { return 6 * (ksi*ksi - ksi); };
 		dphi_ksi[1] = [](double ksi, double h) { return h * (1 - 4 * ksi + 3 * ksi*ksi); };
-		dphi_ksi[2] = [](double ksi, double h) { return 6 * (ksi - ksi*ksi); };
+		dphi_ksi[2] = [](double ksi, double h) { return 6 * (ksi - ksi * ksi); };
 		dphi_ksi[3] = [](double ksi, double h) { return h * (3 * ksi*ksi - 2 * ksi); };
 
 		array <function<double(double, double)>, nSplineFunc1D> d2phi_ksi;
@@ -94,7 +94,7 @@ namespace basis
 		d2phi_ksi[2] = [](double ksi, double h) { return 6 - 12 * ksi; };
 		d2phi_ksi[3] = [](double ksi, double h) { return h * (6 * ksi - 2); };
 
-		
+
 		phi[0] = [phi_](double ksi, double etta, double hx, double hy) { return phi_[0](ksi, hx) * phi_[0](etta, hy); };
 		phi[1] = [phi_](double ksi, double etta, double hx, double hy) { return phi_[1](ksi, hx) * phi_[0](etta, hy); };
 		phi[2] = [phi_](double ksi, double etta, double hx, double hy) { return phi_[0](ksi, hx) * phi_[1](etta, hy); };

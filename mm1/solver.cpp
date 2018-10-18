@@ -4,192 +4,317 @@ namespace solver
 	Solver::Solver()
 	{
 		qSpline.resize(slae.n);
-		qSolution.resize(slae.n);
+		cout << "Building SLAE..." << endl;
+		r.resize(slae.n);
+		z.resize(slae.n);
 	}
-	void Solver::CalculateLocals(int elementNumber)
+	void Solver::Solve()
 	{
-		Element element = grid.elements[elementNumber];
-
-		// Локальные точки по которым считается сплайн		
-		//const int local_nodes_num = 4;
-		//const Point local_nodes[local_nodes_num] =
-		//{
-		//	Point(0.0, 0.0),
-		//	Point(1.0, 0.0),
-		//	Point(0.0, 1.0),
-		//	Point(1.0, 1.0)
-		//};
-
-		const size_t localNodesNum = 16;
-		const Point localNodes[localNodesNum] =
-		{
-			Point(0.0, 0.0),
-			Point(1.0 / 3.0, 0.0),
-			Point(2.0 / 3.0, 0.0),
-			Point(1.0, 0.0),
-			Point(0.0, 1.0 / 3.0),
-			Point(1.0 / 3.0, 1.0 / 3.0),
-			Point(2.0 / 3.0, 1.0 / 3.0),
-			Point(1.0, 1.0 / 3.0),
-			Point(0.0, 2.0 / 3.0),
-			Point(1.0 / 3.0, 2.0 / 3.0),
-			Point(2.0 / 3.0, 2.0 / 3.0),
-			Point(1.0, 2.0 / 3.0),
-			Point(0.0, 1.0),
-			Point(1.0 / 3.0, 1.0),
-			Point(2.0 / 3.0, 1.0),
-			Point(1.0, 1.0)
-		};
-
-		CalculateA(elementNumber, localNodes, localNodesNum);
-		CalculateAlphaMatrix(elementNumber);
-		CalculateBettaMatrix(elementNumber);
-		CalculateF(elementNumber, localNodes, localNodesNum);
+		slae.A.LU();
+		LULOS();
 	}
-	void Solver::CalculateA(int elementNumber, const Point * points, int kPoints)
+
+	void Solver::Draw(unsigned int width, unsigned int height, unsigned int countOfIsolines)
 	{
-		Element element = grid.elements[elementNumber];
+		bmp24_file pic(width, height, "plot.bmp");
 
-		vector <vector<double>> A;
-		A.resize(nSplineFunc);
-		for (int i = 0; i < nSplineFunc; i++)
-			A[i].resize(nSplineFunc);
+		// Поиск максимального и минимального значений для отрисовки изолиний
+		double maxVal = slae.q[0], minVal = slae.q[0];
+		// Поиск максимальной и минимальной координат
+		double maxX = grid.nodes[0].x, minX = grid.nodes[0].x, 
+			maxY = grid.nodes[0].y, minY = grid.nodes[0].y;
+		for (unsigned int i = 1; i < slae.q.size(); i++) {
+			if (slae.q[i] > maxVal)	maxVal = slae.q[i];
+			if (slae.q[i] < minVal)	minVal = slae.q[i];
+			if (grid.nodes[i].x > maxX)	maxX = grid.nodes[i].x;
+			if (grid.nodes[i].x < minX)	minX = grid.nodes[i].x;
+			if (grid.nodes[i].y > maxY)	maxY = grid.nodes[i].y;
+			if (grid.nodes[i].y < minY)	minY = grid.nodes[i].y;
+		}
 
-		double hx = grid.hx(elementNumber);
-		double hy = grid.hy(elementNumber);
+		// Шаги
+		double stepX = (maxX - minX) / (double)width, stepY = (maxY - minY) / (double)height;
+		cout << "\t> Calculating solution grid..." << endl;
+		// Решение по сеткев виде массива
+		double ** solutionGrid = new double *[height];
 
-		for (int i = 0; i < nSplineFunc; i++) {
-			for (int j = i; j < nSplineFunc; j++) {
-				// Цикл по точкам
-				for (int l = 0; l < kPoints; l++) {
-					double p_ksi = points[l].x,
-						p_etta = points[l].y;
-					A[i][j] += splBasis.phi[i](p_ksi, p_etta, hx, hy) * splBasis.phi[j](p_ksi, p_etta, hx, hy);
+#pragma omp parallel for schedule(dynamic)
+		// Цикл по вертикали
+		for (int i = 0; i < (int)height; i++) {
+			solutionGrid[i] = new double[width];
+			// Цикл по горизонтали
+			for (unsigned int j = 0; j < width; j++) {
+				// Получаем решение в точке
+				double x = minX + stepX * (double)j, y = minY + stepY * (double)i;
+				int elementNumber = grid.SearchElement(x, y);
+				solutionGrid[i][j] = slae.GetSolutionInThePoint(x, y, elementNumber);
+			}
+		}
+
+		// Белый фон
+		for (unsigned int i = 0; i < width; i++) {
+			for (unsigned int j = 0; j < height; j++) {
+				RGBTRIPLE col = pic.get_pixel(i, j);
+				pic.set_pixel(i, j, (BYTE)255, (BYTE)255, (BYTE)255);
+			}
+		}
+
+		// Сетка
+		cout << "\t> Calculating grid lines..." << endl;
+		unsigned short colorGrid = 140;
+
+		// Множество координат x
+		set<double> gridX;
+		for (unsigned int i = 0; i < grid.nodes.size(); i++)
+			gridX.insert(grid.nodes[i].x);
+		// Множество координат y
+		set<double> gridY;
+		for (unsigned int i = 0; i < grid.nodes.size(); i++)
+			gridY.insert(grid.nodes[i].y);
+
+		// Проходимся по x 
+		for (set<double>::iterator i = gridX.begin(); i != gridX.end(); i++) {
+			// Проставляем точки по верикали 
+			unsigned int coord = (unsigned int)((*i - minX) / stepX);
+			for (unsigned int j = 0; j < height; j++)
+				pic.set_pixel(coord, j, (BYTE)colorGrid, (BYTE)colorGrid, (BYTE)colorGrid);
+		}
+		// -//- по y
+		for (set<double>::iterator j = gridY.begin(); j != gridY.end(); j++) {
+			// Проставляем точки по горизонтали
+			unsigned int coord = (unsigned int)((*j - minY) / stepY);
+			for (unsigned int i = 0; i < width; i++)
+				pic.set_pixel(i, coord, (BYTE)colorGrid, (BYTE)colorGrid, (BYTE)colorGrid);
+		}
+
+		// Изолинии
+		cout << "\t> Calculating isolines..." << endl;
+		unsigned short colorIsolines = 0; //цвет изолиний
+		// Шаг, с которым рисовать изолинии
+		double isolinesStep = (maxVal - minVal) / (double)(countOfIsolines + 1);
+
+		// Цикл по изолиниям
+		for (unsigned int k = 1; k <= countOfIsolines; k++)	{
+			// Значение, в котором нужно рисовать изолинию
+			double isolineVal = minVal + isolinesStep * (double)k;
+			// Цикл по вертикали
+			for (unsigned int i = 1; i < height - 1; i++) {
+				// Цикл по горизонтали
+				for (unsigned int j = 1; j < width - 1; j++) {
+					// Если в точке i, j нужно отметить пиксель изолинии, то отмечаем
+					if ((solutionGrid[i][j] >= isolineVal && solutionGrid[i + 1][j] < isolineVal) ||
+						(solutionGrid[i][j] <= isolineVal && solutionGrid[i + 1][j] > isolineVal) ||
+						(solutionGrid[i][j] >= isolineVal && solutionGrid[i][j + 1] < isolineVal) ||
+						(solutionGrid[i][j] <= isolineVal && solutionGrid[i][j + 1] > isolineVal)) {
+						pic.set_pixel(j, i,	(BYTE)colorIsolines, (BYTE)colorIsolines,	(BYTE)colorIsolines);
+					}
 				}
 			}
 		}
 
-		for (int i = 1; i < nSplineFunc; i++)
-			for (int j = 0; j < i; j++)
-				A[i][j] = A[j][i];
+		// Вывод изображения в файл
+		pic.write();
 
-		for (int i = 0; i < nSplineFunc; i++) {
-			int id_i = element.dof[i];
-			for (int j = 0; j < nSplineFunc; j++) {
-				int id_j = element.dof[j];
-				slae.A.AddElement(id_i, id_j, A[i][j]);
+		for (unsigned int i = 0; i < height; i++)
+			delete[] solutionGrid[i];
+		delete[] solutionGrid;
+	}
+	void Solver::Draw(unsigned int width, unsigned int height, unsigned int countOfIsolines, set<int> &nd)
+	{
+		
+		class bmp24_file pic(width, height, "plot_spline.bmp");
+		cout << endl << "Drawing picture..." << endl;
+		auto iter = nd.begin();
+		// Поиск максимального и минимального значений для отрисовки изолиний
+		double maxVal = slae.q[0], minVal = slae.q[0];
+		// Поиск максимальной и минимальной координат
+		double maxX = grid.nodes[0].x, minX = grid.nodes[0].x,
+			maxY = grid.nodes[0].y, minY = grid.nodes[0].y;
+		unsigned int size = nd.size();
+		iter++;
+		for (unsigned int i = 1; i < size; i++) {
+			if (slae.q[*iter] > maxVal)	maxVal = slae.q[*iter];
+			if (slae.q[*iter] < minVal)	minVal = slae.q[*iter];
+			if (grid.nodes[i].x > maxX)	maxX = grid.nodes[i].x;
+			if (grid.nodes[i].x < minX)	minX = grid.nodes[i].x;
+			if (grid.nodes[i].y > maxY)	maxY = grid.nodes[i].y;
+			if (grid.nodes[i].y < minY)	minY = grid.nodes[i].y;
+			iter++;
+		}
+		// Шаги
+		double stepX = (maxX - minX) / (double)width, stepY = (maxY - minY) / (double)height;
+		cout << "\t> Calculating solution grid..." << endl;
+		// Решение по сеткев виде массива
+		double ** solutionGrid = new double *[height];
+
+#pragma omp parallel for schedule(dynamic)
+		// Цикл по вертикали
+		for (int i = 0; i < (int)height; i++) {
+			solutionGrid[i] = new double[width];
+			// Цикл по горизонтали
+			for (unsigned int j = 0; j < width; j++) {
+				// Получаем решение в точке
+				double x = minX + stepX * (double)j, y = minY + stepY * (double)i;
+				int elementNumber = grid.SearchElement(x, y);
+				solutionGrid[i][j] = slae.GetSolutionInThePointWithSpline(x, y, elementNumber);
 			}
 		}
-	}
-	void Solver::CalculateAlphaMatrix(int elementNumber)
-	{
-		vector <vector<double>> AM;
-		AM.resize(nSplineFunc);
-		for (int i = 0; i < nSplineFunc; i++)
-			AM[i].resize(nSplineFunc);
-		Element element = grid.elements[elementNumber];
 
-		double hx = grid.hx(elementNumber);
-		double hy = grid.hy(elementNumber);
-		double hx2 = hx * hx;
-		double hy2 = hy * hy;
+		// Белый фон
+		for (unsigned int i = 0; i < width; i++) {
+			for (unsigned int j = 0; j < height; j++) {
+				RGBTRIPLE col = pic.get_pixel(i, j);
+				pic.set_pixel(i, j, (BYTE)255, (BYTE)255, (BYTE)255);
+			}
+		}
 
-		double jacobian = hx * hy / 4.0;
+		// Сетка
+		cout << "\t> Calculating grid lines..." << endl;
+		unsigned short colorGrid = 140;
 
-		for (int i = 0; i < nSplineFunc; i++) {
-			for (int j = i; j < nSplineFunc; j++) {
-				double am1 = 0, am2 = 0;
-				for (int k = 0; k < 25; k++) {
-					double p_ksi = 0.5 + 0.5 * gaussPoints[0][k],
-						p_etta = 0.5 + 0.5 * gaussPoints[0][k];
-					am1 += gaussWeights[k] *
-						splBasis.dphiksi[i](p_ksi, p_etta, hx, hy) * splBasis.dphiksi[j](p_ksi, p_etta, hx, hy);
-					am2 += gaussWeights[k] *
-						splBasis.dphietta[i](p_ksi, p_etta, hx, hy) * splBasis.dphietta[j](p_ksi, p_etta, hx, hy);
+		// Множество координат x
+		set<double> gridX;
+		for (unsigned int i = 0; i < grid.nodes.size(); i++)
+			gridX.insert(grid.nodes[i].x);
+		// Множество координат y
+		set<double> gridY;
+		for (unsigned int i = 0; i < grid.nodes.size(); i++)
+			gridY.insert(grid.nodes[i].y);
+
+		// Проходимся по x 
+		for (set<double>::iterator i = gridX.begin(); i != gridX.end(); i++) {
+			// Проставляем точки по верикали 
+			unsigned int coord = (unsigned int)((*i - minX) / stepX);
+			for (unsigned int j = 0; j < height; j++)
+				pic.set_pixel(coord, j, (BYTE)colorGrid, (BYTE)colorGrid, (BYTE)colorGrid);
+		}
+		// -//- по y
+		for (set<double>::iterator j = gridY.begin(); j != gridY.end(); j++) {
+			// Проставляем точки по горизонтали
+			unsigned int coord = (unsigned int)((*j - minY) / stepY);
+			for (unsigned int i = 0; i < width; i++)
+				pic.set_pixel(i, coord, (BYTE)colorGrid, (BYTE)colorGrid, (BYTE)colorGrid);
+		}
+		// Изолинии
+		cout << "\t> Calculating isolines..." << endl;
+		unsigned short colorIsolines = 0; //цвет изолиний
+		// Шаг, с которым рисовать изолинии
+		double isolinesStep = (maxVal - minVal) / (double)(countOfIsolines + 1);
+
+		// Цикл по изолиниям
+		for (unsigned int k = 1; k <= countOfIsolines; k++) {
+			// Значение, в котором нужно рисовать изолинию
+			double isolineVal = minVal + isolinesStep * (double)k;
+			// Цикл по вертикали
+			for (unsigned int i = 1; i < height - 1; i++) {
+				// Цикл по горизонтали
+				for (unsigned int j = 1; j < width - 1; j++) {
+					// Если в точке i, j нужно отметить пиксель изолинии, то отмечаем
+					if ((solutionGrid[i][j] >= isolineVal && solutionGrid[i + 1][j] < isolineVal) ||
+						(solutionGrid[i][j] <= isolineVal && solutionGrid[i + 1][j] > isolineVal) ||
+						(solutionGrid[i][j] >= isolineVal && solutionGrid[i][j + 1] < isolineVal) ||
+						(solutionGrid[i][j] <= isolineVal && solutionGrid[i][j + 1] > isolineVal)) {
+						pic.set_pixel(j, i, (BYTE)colorIsolines, (BYTE)colorIsolines, (BYTE)colorIsolines);
+					}
 				}
-				AM[i][j] = (am1 / hx2 + am2 / hy2) * jacobian * alpha;
 			}
 		}
 
-		for (int i = 1; i < 4; i++)
-			for (int j = 0; j < i; j++)
-				AM[i][j] = AM[j][i];
+		// Вывод изображения в файл
+		pic.write();
 
-		for (int i = 0; i < nSplineFunc; i++) {
-			int id_i = element.dof[i];
-			for (int j = 0; j < nSplineFunc; j++) {
-				int id_j = element.dof[j];
-				slae.A.AddElement(id_i, id_j, AM[i][j]);
-			}
-		}
+		for (unsigned int i = 0; i < height; i++)
+			delete[] solutionGrid[i];
+		delete[] solutionGrid;
 	}
-	void Solver::CalculateBettaMatrix(int elementNumber)
+	//Вычисление нормы вектора
+	double Solver::Norm(const vector<double> &x)
 	{
-		vector <vector<double>> BM;
-		BM.resize(nSplineFunc);
-		for (int i = 0; i < nSplineFunc; i++)
-			BM[i].resize(nSplineFunc);
-		Element element = grid.elements[elementNumber];
+		double norm = 0;
+		int size = x.size();
 
-		double hx = grid.hx(elementNumber);
-		double hy = grid.hy(elementNumber);
-		double hx2 = hx * hx;
-		double hy2 = hy * hy;
+		for (int i = 0; i < size; i++)
+			norm += x[i] * x[i];
 
-		double jacobian = hx * hy / 4.0;
-
-		for (int i = 0; i < nSplineFunc; i++) {
-			for (int j = i; j < nSplineFunc; j++) {
-				double bm = 0;
-				for (int k = 0; k < 25; k++) {
-					double p_ksi = 0.5 + 0.5 * gaussPoints[0][k],
-						p_etta = 0.5 + 0.5 * gaussPoints[0][k];
-					bm += gaussWeights[k] *
-						(splBasis.d2phiksi[i](p_ksi, p_etta, hx, hy) / hx + splBasis.d2phietta[i](p_ksi, p_etta, hx, hy) / hy) *
-						(splBasis.d2phiksi[j](p_ksi, p_etta, hx, hy) / hx + splBasis.d2phietta[j](p_ksi, p_etta, hx, hy) / hy);
-				}
-				BM[i][j] = bm * jacobian * betta;
-			}
-		}
-
-		for (int i = 1; i < 4; i++)
-			for (int j = 0; j < i; j++)
-				BM[i][j] = BM[j][i];
-
-		for (int i = 0; i < nSplineFunc; i++) {
-			int id_i = element.dof[i];
-			for (int j = 0; j < nSplineFunc; j++) {
-				int id_j = element.dof[j];
-				slae.A.AddElement(id_i, id_j, BM[i][j]);
-			}
-		}
+		return sqrt(norm);
 	}
-	void Solver::CalculateF(int elementNumber, const Point * points, int kPoints)
+	//Скалярное произведение векторов
+	double Solver::Scalar(const vector<double> &x, const vector<double> &y)
 	{
-		Element element = grid.elements[elementNumber];
+		double sum = 0;
+		int size = x.size();
+		for (int i = 0; i < size; i++)
+			sum += x[i] * y[i];
 
-		vector<double> F;
-		F.resize(nSplineFunc);
+		return sum;
+	}
+	double Solver::RelDiscrepancy()
+	{
+		double dis1, dis2;
+		dis1 = Scalar(r, r);
+		dis2 = Scalar(slae.F, slae.F);
+		double dis = dis1 / dis2;
+		return sqrt(dis);
+	}
+	void Solver::LULOS()
+	{
+		double a, b, pp, dis, rr;
+		int i, k;
+		vector <double> Ax(slae.n), C(slae.n), p(slae.n);
+		//Ax0
+		Ax = slae.A * slae.q;
+		//f-Ax0
+		for (i = 0; i < slae.n; i++)
+			r[i] = slae.F[i] - Ax[i];
 
-		double x0 = grid.nodes[element.nodes[0]].x;
-		double y0 = grid.nodes[element.nodes[0]].y;
+		//r0=L^(-1)(f-Ax0)
+		slae.A.LYF(r, r);
 
-		double hx = grid.hx(elementNumber);
-		double hy = grid.hy(elementNumber);
+		//z0=U^(-1)r0->r0=Uz0
+		slae.A.UXY(r, z);
 
-		for (int i = 0; i < nSplineFunc; i++) {
-			// Цикл по точкам
-			for (int l = 0; l < kPoints; l++) {
-				double p_ksi = points[l].x,
-					p_etta = points[l].y;
-				double f = get_solution_in_point_bilinear(hx * p_ksi + x0, hy * p_etta + y0, elementNumber, qSolution);
-				F[i] += splBasis.phi[i](p_ksi, p_etta, hx, hy) * f;
+		//p0=L^(-1)Az0
+		Ax = slae.A * z;//Az0
+		slae.A.LYF(Ax, p);
+
+		rr = Scalar(r, r);
+		dis = Scalar(r, r) / rr;
+		dis = sqrt(dis);
+		k = 0;
+
+		for (k = 0; dis > epsilon && k <= maxCountOfIterations; k++) {
+			//Аk
+			pp = Scalar(p, p);
+			a = Scalar(p, r) / pp;
+
+			//Xk, Rk
+			for (i = 0; i < slae.n; i++) {
+				slae.q[i] = slae.q[i] + a * z[i];
+				r[i] = r[i] - a * p[i];
 			}
+
+			//UY=rk->Y=U^(-1)rk
+			slae.A.UXY(r, C);
+			//AU^(-1)rk=Ax
+			Ax = slae.A * C;
+			//L^(-1)AU^(-1)rk=Y2->L^(-1)B=Y2->LY2=B->Y2=L^(-1)AU^(-1)rk
+			slae.A.LYF(Ax, Ax);
+			//bk
+			b = -Scalar(p, Ax) / pp;
+
+			//zk=U^(-1)rk+bkz[k-1]
+			//pk
+			for (i = 0; i < slae.n; i++) {
+				z[i] = C[i] + b * z[i];
+				p[i] = Ax[i] + b * p[i];
+			}
+			dis = Scalar(r, r) / rr;
+			dis = sqrt(dis);
 		}
 
-		for (int i = 0; i < nSplineFunc; i++) {
-			int id_i = element.dof[i];
-			slae.F[id_i] += F[i];
-		}
+		dis = RelDiscrepancy();
+		printf("%le\t iter = %d", dis, k);
+		getchar();
+		
 	}
 }
